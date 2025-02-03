@@ -1,0 +1,46 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class DirectAddressTable {
+    vector<int> table;
+    vector<bool> exists;
+    
+public:
+    DirectAddressTable(int n) : table(n, -1), exists(n, false) {}
+    
+    void insert(int key, int value) {
+        table[key] = value;
+        exists[key] = true;
+    }
+    
+    string search(int key) {
+        return exists[key] ? to_string(table[key]) : "NOT FOUND";
+    }
+    
+    void remove(int key) {
+        exists[key] = false;
+    }
+};
+
+int main() {
+    int n, q;
+    cin >> n >> q;
+    DirectAddressTable dat(n);
+    
+    while (q--) {
+        string op;
+        int key, value;
+        cin >> op >> key;
+        
+        if (op == "INSERT") {
+            cin >> value;
+            dat.insert(key, value);
+        } else if (op == "SEARCH") {
+            cout << dat.search(key) << endl;
+        } else if (op == "DELETE") {
+            dat.remove(key);
+        }
+    }
+    return 0;
+}
