@@ -1,0 +1,95 @@
+#include <iostream>
+#include <vector>
+#include <list>
+using namespace std;
+
+class HashTable {
+    int size;
+    string method;
+    vector<list<int>> table;
+    vector<int> openTable;
+    vector<bool> occupied;
+
+    int hash(int key) {
+        return key % size;
+    }
+
+public:
+    HashTable(int m, string method) : size(m), method(method) {
+        if (method == "CHAINING") {
+            table.resize(size);
+        } else {
+            openTable.resize(size, -1);
+            occupied.resize(size, false);
+        }
+    }
+
+    void insert(int key) {
+        int index = hash(key);
+        if (method == "CHAINING") {
+            table[index].push_back(key);
+        } else {
+            while (occupied[index]) {
+                index = (index + 1) % size;
+            }
+            openTable[index] = key;
+            occupied[index] = true;
+        }
+    }
+
+    bool search(int key) {
+        int index = hash(key);
+        if (method == "CHAINING") {
+            for (int val : table[index]) {
+                if (val == key) return true;
+            }
+        } else {
+            int start = index;
+            while (occupied[index]) {
+                if (openTable[index] == key) return true;
+                index = (index + 1) % size;
+                if (index == start) break;
+            }
+        }
+        return false;
+    }
+
+    void remove(int key) {
+        int index = hash(key);
+        if (method == "CHAINING") {
+            table[index].remove(key);
+        } else {
+            int start = index;
+            while (occupied[index]) {
+                if (openTable[index] == key) {
+                    openTable[index] = -1;
+                    occupied[index] = false;
+                    return;
+                }
+                index = (index + 1) % size;
+                if (index == start) break;
+            }
+        }
+    }
+};
+
+int main() {
+    int m, q;
+    string method;
+    cin >> m >> method >> q;
+    HashTable hashTable(m, method);
+    
+    while (q--) {
+        string op;
+        int key;
+        cin >> op >> key;
+        if (op == "INSERT") {
+            hashTable.insert(key);
+        } else if (op == "SEARCH") {
+            cout << (hashTable.search(key) ? "FOUND" : "NOT FOUND") << endl;
+        } else if (op == "DELETE") {
+            hashTable.remove(key);
+        }
+    }
+    return 0;
+}
